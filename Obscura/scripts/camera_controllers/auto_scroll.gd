@@ -25,19 +25,19 @@ func _process(delta: float) -> void:
 	#left
 	var diff_between_left_edges = tpos.x - (cpos.x + top_left.x)
 	if diff_between_left_edges < 0:
-		global_position.x += diff_between_left_edges
+		target.global_position.x -= diff_between_left_edges
 	#right
 	var diff_between_right_edges = tpos.x - (cpos.x + bottom_right.x)
 	if diff_between_right_edges > 0:
-		global_position.x += diff_between_right_edges
+		target.global_position.x -= diff_between_right_edges
 	#top
 	var diff_between_top_edges = tpos.z - (cpos.z + top_left.y)
 	if diff_between_top_edges > 0:
-		global_position.z += diff_between_top_edges
+		target.global_position.z -= diff_between_top_edges
 	#bottom
 	var diff_between_bottom_edges = tpos.z - (cpos.z + bottom_right.y)
 	if diff_between_bottom_edges < 0:
-		global_position.z += diff_between_bottom_edges
+		target.global_position.z -= diff_between_bottom_edges
 		
 	super(delta)
 
