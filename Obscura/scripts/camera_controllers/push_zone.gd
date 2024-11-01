@@ -54,17 +54,28 @@ func _process(delta: float) -> void:
 		global_position.z += diff_push_top
 		
 	
-	var diff_speedup_left = (cpos.x + pushbox_top_left.x) - tpos.x
+	var diff_speedup_left = tpos.x - (cpos.x + speedup_top_left.x)
 	is_left_speedup = diff_speedup_left < 0
-	var diff_speedup_right = tpos.x - (cpos.x + pushbox_bottom_right.x)
+	var diff_speedup_right = tpos.x - (cpos.x + speedup_bottom_right.x)
 	is_right_speedup = diff_speedup_right > 0
-	var diff_speedup_bottom = tpos.z - (cpos.z + pushbox_bottom_right.y)
+	var diff_speedup_bottom = tpos.z - (cpos.z + speedup_bottom_right.y)
 	is_below_speedup = diff_speedup_bottom > 0
-	var diff_speedup_top = (cpos.z + pushbox_top_left.y) - tpos.z
+	var diff_speedup_top = tpos.z - (cpos.z + speedup_top_left.y)
 	is_above_speedup = diff_speedup_top < 0
+	
+	if (!is_above_push && !is_below_push):
+		if (is_above_speedup && target.velocity.z < 0):
+			global_position.z += target.velocity.z * push_ratio * delta
+		if (is_below_speedup && target.velocity.z > 0):
+			global_position.z += target.velocity.z * push_ratio * delta
+	if (!is_left_push && !is_right_push):
+		if (is_left_speedup && target.velocity.x < 0):
+			global_position.x += target.velocity.x * push_ratio * delta
+		if (is_right_speedup && target.velocity.x > 0):
+			global_position.x += target.velocity.x * push_ratio * delta
+	
 		
 	super(delta)
-	
 
 
 func draw_logic() -> void:
