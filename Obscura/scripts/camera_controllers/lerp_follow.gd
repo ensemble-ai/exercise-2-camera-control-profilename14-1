@@ -28,8 +28,8 @@ func _physics_process(delta: float) -> void:
 		#Velocity is in units per second, so we can simply translate by a factor of it.
 		var follow_strength:float = target.velocity.length() * follow_speed
 		_follow_camera(diff_horizontally, diff_vertically, delta, follow_strength)
-		
 	else:
+		#catch up if the player isn't moving
 		_follow_camera(diff_horizontally, diff_vertically, delta, catchup_speed)
 	
 	#detect >leash unit displacement (circular around the target) of our camera

@@ -24,36 +24,40 @@ func _process(delta: float) -> void:
 	var cpos = global_position
 	
 	
-	
+	#is the player touching any of the 4 edges of the outer push square?
 	var is_left_push:bool
 	var is_right_push:bool
 	var is_below_push:bool
 	var is_above_push:bool
-	
+	#is the player beyond any of the 4 edges of the inner speedup square?
 	var is_left_speedup:bool
 	var is_right_speedup:bool
 	var is_below_speedup:bool
 	var is_above_speedup:bool
 	
-	#boundary checks and boolean definition for this frame
+	#boundary checks and boolean definitions for this frame
+	#player is left of bounds if diff is negative
 	var diff_push_left = tpos.x - (cpos.x + pushbox_top_left.x)
 	is_left_push = diff_push_left < 0
 	if is_left_push:
 		global_position.x += diff_push_left
+	#player is right of bounds if diff is positive
 	var diff_push_right = tpos.x - (cpos.x + pushbox_bottom_right.x)
 	is_right_push = diff_push_right > 0
 	if is_right_push:
 		global_position.x += diff_push_right
+	#player is BELOW bounds if diff is positive
 	var diff_push_bottom = tpos.z - (cpos.z + pushbox_bottom_right.y)
 	is_below_push = diff_push_bottom > 0
 	if is_below_push:
 		global_position.z += diff_push_bottom
+	#player is ABOVE bounds if diff is negative
 	var diff_push_top = tpos.z - (cpos.z + pushbox_top_left.y)
 	is_above_push = diff_push_top < 0
 	if is_above_push:
 		global_position.z += diff_push_top
 		
-	
+	#check if we are in speedup zone ranges, between the inner and outer squares
 	var diff_speedup_left = tpos.x - (cpos.x + speedup_top_left.x)
 	is_left_speedup = diff_speedup_left < 0
 	var diff_speedup_right = tpos.x - (cpos.x + speedup_bottom_right.x)
@@ -63,6 +67,7 @@ func _process(delta: float) -> void:
 	var diff_speedup_top = tpos.z - (cpos.z + speedup_top_left.y)
 	is_above_speedup = diff_speedup_top < 0
 	
+	#y-axis speedup zones dont affect x-axis movement and vice versa (mentioned in Lecture 10-24)
 	if (!is_above_push && !is_below_push):
 		if (is_above_speedup && target.velocity.z < 0):
 			global_position.z += target.velocity.z * push_ratio * delta
