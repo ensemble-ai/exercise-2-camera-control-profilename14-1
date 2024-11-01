@@ -12,6 +12,28 @@ func _ready() -> void:
 	super()
 	position = target.position
 	
+#physics process is used to avoid fps dependency and jitteriness
+func _physics_process(delta: float) -> void:
+	
+	var tpos = target.global_position
+	var cpos = global_position
+	
+	#horizontal (with top down view) check. Positive means target is right of us
+	var diff_horizontally = (tpos.x - cpos.x)
+	
+	#vertical (with top down view) check. Positive means target is below us
+	var diff_vertically = (tpos.z - cpos.z)
+	
+	if target.velocity.length() > 0:
+		#Velocity is in units per second, so we can simply translate by a factor of it.
+		global_position.x += target.velocity.x * follow_speed * delta
+		global_position.z += target.velocity.z * follow_speed * delta
+	else:
+		_follow_camera(diff_horizontally, diff_vertically, delta)
+	
+	#detect >leash unit displacement (circular around the target) of our camera
+	if Vector2(diff_horizontally, diff_vertically).length() > leash_distance:
+		_leash_camera(diff_horizontally, diff_vertically)
 
 func _process(delta: float) -> void:
 	if !current:
@@ -20,31 +42,21 @@ func _process(delta: float) -> void:
 	if draw_camera_logic:
 		draw_logic()
 	
-	var tpos = target.global_position
-	var cpos = global_position
-	
-	#check if the target has moved from the target lock camera.
-	#horizontal (with top down view) check. Positive means target is right of us
-	var diff_horizontally = (tpos.x - cpos.x)
-	if abs(diff_horizontally) > 0:
-		pass
-	#vertical (with top down view) check. Positive means target is below us
-	var diff_vertically = (tpos.z - cpos.z)
-	if abs(diff_vertically) > 0:
-		pass
-		
-	if Vector2(diff_horizontally, diff_vertically).length() > leash_distance:
-		_leash_camera(diff_horizontally, diff_vertically)
-		
-		
 	super(delta)
 
+#if camera is more than 10 units away, we scale the displacement to the leash distance.
 func _leash_camera(diff_x: float, diff_z: float) -> void:
 	var diff_normalized:Vector2 = Vector2(diff_x, diff_z).normalized()
 	var new_displacement:Vector2 = diff_normalized * leash_distance
 	global_position.x = target.global_position.x - new_displacement.x
 	global_position.z = target.global_position.z - new_displacement.y
-	
+
+#This function simply moves the vector in a straight line toward the player, scaled to follow speed
+func _follow_camera(diff_x: float, diff_z: float, delta: float) -> void:
+	var diff_normalized:Vector2 = Vector2(diff_x, diff_z).normalized()
+	var follow_step:Vector2 = diff_normalized * catchup_speed * delta
+	global_position.x = global_position.x + follow_step.x
+	global_position.z = global_position.z + follow_step.y
 
 func draw_logic() -> void:
 	var mesh_instance := MeshInstance3D.new()
