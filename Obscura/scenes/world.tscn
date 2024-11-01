@@ -49,8 +49,8 @@ cameras = [NodePath("../PushBoxCamera"), NodePath("../PushBoxCamera2"), NodePath
 [node name="LerpFollowCamera" parent="." node_paths=PackedStringArray("target") instance=ExtResource("3_ttnp6")]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 30, 0)
 script = ExtResource("4_xnrmt")
-follow_speed = 0.5
-catchup_speed = 10.0
+follow_speed = 0.75
+catchup_speed = 20.0
 leash_distance = 10.0
 target = NodePath("../Vessel")
 dist_above_target = 20.0

@@ -4,8 +4,8 @@ extends CameraControllerBase
 
 const DRAW_LOGIC_SIZE:float = 5
 
-@export var follow_speed:float = 0.5 #Ratio of player speed, 1 is equal
-@export var catchup_speed:float = 10.0
+@export var follow_speed:float = 0.75 #Ratio of player speed, 1 is equal
+@export var catchup_speed:float = 20.0
 @export var leash_distance:float = 10.0
 
 func _ready() -> void:
@@ -26,10 +26,11 @@ func _physics_process(delta: float) -> void:
 	
 	if target.velocity.length() > 0:
 		#Velocity is in units per second, so we can simply translate by a factor of it.
-		global_position.x += target.velocity.x * follow_speed * delta
-		global_position.z += target.velocity.z * follow_speed * delta
+		var follow_strength:float = target.velocity.length() * follow_speed
+		_follow_camera(diff_horizontally, diff_vertically, delta, follow_strength)
+		
 	else:
-		_follow_camera(diff_horizontally, diff_vertically, delta)
+		_follow_camera(diff_horizontally, diff_vertically, delta, catchup_speed)
 	
 	#detect >leash unit displacement (circular around the target) of our camera
 	if Vector2(diff_horizontally, diff_vertically).length() > leash_distance:
@@ -47,14 +48,20 @@ func _process(delta: float) -> void:
 #if camera is more than 10 units away, we scale the displacement to the leash distance.
 func _leash_camera(diff_x: float, diff_z: float) -> void:
 	var diff_normalized:Vector2 = Vector2(diff_x, diff_z).normalized()
-	var new_displacement:Vector2 = diff_normalized * leash_distance
+	var new_displacement:Vector2 = diff_normalized * leash_distance * 0.99
 	global_position.x = target.global_position.x - new_displacement.x
 	global_position.z = target.global_position.z - new_displacement.y
 
-#This function simply moves the vector in a straight line toward the player, scaled to follow speed
-func _follow_camera(diff_x: float, diff_z: float, delta: float) -> void:
+#This function simply moves the vector in a straight line toward the player
+func _follow_camera(diff_x: float, diff_z: float, delta: float, speed: float) -> void:
 	var diff_normalized:Vector2 = Vector2(diff_x, diff_z).normalized()
-	var follow_step:Vector2 = diff_normalized * catchup_speed * delta
+	var follow_step:Vector2 = diff_normalized * speed * delta
+	
+	#if our step is larger than the actual camera displacement, scale it down
+	if follow_step.length() > Vector2(diff_x, diff_z).length():
+		var overreach_factor:float = Vector2(diff_x, diff_z).length() / follow_step.length()
+		follow_step *= overreach_factor
+	
 	global_position.x = global_position.x + follow_step.x
 	global_position.z = global_position.z + follow_step.y
 
