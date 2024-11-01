@@ -1,4 +1,4 @@
-class_name PositionLock
+class_name LerpFollow
 extends CameraControllerBase
 
 
@@ -53,7 +53,6 @@ func draw_logic() -> void:
 	immediate_mesh.surface_add_vertex(Vector3(0, 0, top))
 	immediate_mesh.surface_end()
 	
-	immediate_mesh.surface_begin(Mesh.PRIMITIVE_LINES, material)
 	immediate_mesh.surface_add_vertex(Vector3(left, 0, 0))
 	immediate_mesh.surface_add_vertex(Vector3(right, 0, 0))
 	immediate_mesh.surface_end()

@@ -47,6 +47,7 @@ func _process(delta: float) -> void:
 	
 func _autoscroll_camera(delta: float) -> void:
 	position = position + (autoscroll_speed * delta)
+	target.position = target.position + (autoscroll_speed * delta)
 	
 	return
 
