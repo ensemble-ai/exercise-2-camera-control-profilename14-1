@@ -2,8 +2,9 @@ class_name AutoScroll
 extends CameraControllerBase
 
 
-@export var top_left:Vector2 = Vector2(-5, 5)
-@export var bottom_right:Vector2 = Vector2(5, -5)
+@export var top_left:Vector2 = Vector2(-5, -5)
+@export var bottom_right:Vector2 = Vector2(5, 5)
+@export var autoscroll_speed:Vector3 = Vector3(5, 0, 0)
 
 
 func _ready() -> void:
@@ -21,25 +22,33 @@ func _process(delta: float) -> void:
 	var tpos = target.global_position
 	var cpos = global_position
 	
+	_autoscroll_camera(delta)
+	
 	#boundary checks
-	#left
+	
+	#player is left of bounds if diff is negative
 	var diff_between_left_edges = tpos.x - (cpos.x + top_left.x)
 	if diff_between_left_edges < 0:
 		target.global_position.x -= diff_between_left_edges
-	#right
+	#player is right of bounds if diff is positive
 	var diff_between_right_edges = tpos.x - (cpos.x + bottom_right.x)
 	if diff_between_right_edges > 0:
 		target.global_position.x -= diff_between_right_edges
-	#top
-	var diff_between_top_edges = tpos.z - (cpos.z + top_left.y)
-	if diff_between_top_edges > 0:
-		target.global_position.z -= diff_between_top_edges
-	#bottom
+	#player is BELOW bounds if diff is positive
 	var diff_between_bottom_edges = tpos.z - (cpos.z + bottom_right.y)
-	if diff_between_bottom_edges < 0:
+	if diff_between_bottom_edges > 0:
 		target.global_position.z -= diff_between_bottom_edges
+	#player is ABOVE bounds if diff is negative
+	var diff_between_top_edges = tpos.z - (cpos.z + top_left.y)
+	if diff_between_top_edges < 0:
+		target.global_position.z -= diff_between_top_edges
 		
 	super(delta)
+	
+func _autoscroll_camera(delta: float) -> void:
+	position = position + (autoscroll_speed * delta)
+	
+	return
 
 
 func draw_logic() -> void:
