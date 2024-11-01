@@ -21,11 +21,11 @@ func _process(delta: float) -> void:
 	var cpos = global_position
 	
 	#check if the target has moved from the target lock camera.
-	#horizontal (with top down view) check
+	#horizontal (with top down view) check. Positive means target is right of us
 	var diff_horizontally = (tpos.x - cpos.x)
 	if abs(diff_horizontally) > 0:
 		global_position.x += diff_horizontally
-	#vertical (with top down view) check
+	#vertical (with top down view) check. Positive means target is below us
 	var diff_vertically = (tpos.z - cpos.z)
 	if abs(diff_vertically) > 0:
 		global_position.z += diff_vertically

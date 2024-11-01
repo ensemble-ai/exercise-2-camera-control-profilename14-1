@@ -4,6 +4,9 @@ extends CameraControllerBase
 
 const DRAW_LOGIC_SIZE:float = 5
 
+@export var follow_speed:float = 0.5 #Ratio of player speed, 1 is equal
+@export var catchup_speed:float = 10.0
+@export var leash_distance:float = 10.0
 
 func _ready() -> void:
 	super()
@@ -21,19 +24,27 @@ func _process(delta: float) -> void:
 	var cpos = global_position
 	
 	#check if the target has moved from the target lock camera.
-	#horizontal (with top down view) check
+	#horizontal (with top down view) check. Positive means target is right of us
 	var diff_horizontally = (tpos.x - cpos.x)
 	if abs(diff_horizontally) > 0:
-		global_position.x += diff_horizontally
-	#vertical (with top down view) check
+		pass
+	#vertical (with top down view) check. Positive means target is below us
 	var diff_vertically = (tpos.z - cpos.z)
 	if abs(diff_vertically) > 0:
-		global_position.z += diff_vertically
+		pass
 		
+	if Vector2(diff_horizontally, diff_vertically).length() > leash_distance:
+		_leash_camera(diff_horizontally, diff_vertically)
 		
 		
 	super(delta)
 
+func _leash_camera(diff_x: float, diff_z: float) -> void:
+	var diff_normalized:Vector2 = Vector2(diff_x, diff_z).normalized()
+	var new_displacement:Vector2 = diff_normalized * leash_distance
+	global_position.x = target.global_position.x - new_displacement.x
+	global_position.z = target.global_position.z - new_displacement.y
+	
 
 func draw_logic() -> void:
 	var mesh_instance := MeshInstance3D.new()
@@ -53,6 +64,7 @@ func draw_logic() -> void:
 	immediate_mesh.surface_add_vertex(Vector3(0, 0, top))
 	immediate_mesh.surface_end()
 	
+	immediate_mesh.surface_begin(Mesh.PRIMITIVE_LINES, material)
 	immediate_mesh.surface_add_vertex(Vector3(left, 0, 0))
 	immediate_mesh.surface_add_vertex(Vector3(right, 0, 0))
 	immediate_mesh.surface_end()
