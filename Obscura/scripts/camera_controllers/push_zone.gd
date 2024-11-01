@@ -1,7 +1,7 @@
 class_name PushZone
 extends CameraControllerBase
 
-
+@export var push_ratio:float = 0.5
 @export var pushbox_top_left:Vector2 = Vector2(-10, -10)
 @export var pushbox_bottom_right:Vector2 = Vector2(10, 10)
 @export var speedup_top_left:Vector2 = Vector2(-5, -5)
@@ -24,24 +24,44 @@ func _process(delta: float) -> void:
 	var cpos = global_position
 	
 	
-	#boundary checks
 	
-	#player is left of bounds if diff is negative
-	var diff_between_left_edges = tpos.x - (cpos.x + pushbox_top_left.x)
-	if diff_between_left_edges < 0:
-		global_position.x += diff_between_left_edges
-	#player is right of bounds if diff is positive
-	var diff_between_right_edges = tpos.x - (cpos.x + pushbox_bottom_right.x)
-	if diff_between_right_edges > 0:
-		global_position.x += diff_between_right_edges
-	#player is BELOW bounds if diff is positive
-	var diff_between_bottom_edges = tpos.z - (cpos.z + pushbox_bottom_right.y)
-	if diff_between_bottom_edges > 0:
-		global_position.z += diff_between_bottom_edges
-	#player is ABOVE bounds if diff is negative
-	var diff_between_top_edges = tpos.z - (cpos.z + pushbox_top_left.y)
-	if diff_between_top_edges < 0:
-		global_position.z += diff_between_top_edges
+	var is_left_push:bool
+	var is_right_push:bool
+	var is_below_push:bool
+	var is_above_push:bool
+	
+	var is_left_speedup:bool
+	var is_right_speedup:bool
+	var is_below_speedup:bool
+	var is_above_speedup:bool
+	
+	#boundary checks and boolean definition for this frame
+	var diff_push_left = tpos.x - (cpos.x + pushbox_top_left.x)
+	is_left_push = diff_push_left < 0
+	if is_left_push:
+		global_position.x += diff_push_left
+	var diff_push_right = tpos.x - (cpos.x + pushbox_bottom_right.x)
+	is_right_push = diff_push_right > 0
+	if is_right_push:
+		global_position.x += diff_push_right
+	var diff_push_bottom = tpos.z - (cpos.z + pushbox_bottom_right.y)
+	is_below_push = diff_push_bottom > 0
+	if is_below_push:
+		global_position.z += diff_push_bottom
+	var diff_push_top = tpos.z - (cpos.z + pushbox_top_left.y)
+	is_above_push = diff_push_top < 0
+	if is_above_push:
+		global_position.z += diff_push_top
+		
+	
+	var diff_speedup_left = (cpos.x + pushbox_top_left.x) - tpos.x
+	is_left_speedup = diff_speedup_left < 0
+	var diff_speedup_right = tpos.x - (cpos.x + pushbox_bottom_right.x)
+	is_right_speedup = diff_speedup_right > 0
+	var diff_speedup_bottom = tpos.z - (cpos.z + pushbox_bottom_right.y)
+	is_below_speedup = diff_speedup_bottom > 0
+	var diff_speedup_top = (cpos.z + pushbox_top_left.y) - tpos.z
+	is_above_speedup = diff_speedup_top < 0
 		
 	super(delta)
 	
